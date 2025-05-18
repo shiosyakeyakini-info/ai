@@ -14,6 +14,8 @@ type Config = {
 	checkEmojisAtOnce?: boolean;
 	geminiProApiKey?: string;
 	pLaMoApiKey?: string;
+	openAiApiKey?: string;
+	openAiModel?: string;
 	prompt?: string;
 	aichatRandomTalkEnabled?: boolean;
 	aichatRandomTalkProbability?: string;

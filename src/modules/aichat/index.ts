@@ -8,11 +8,14 @@ import urlToBase64 from '@/utils/url2base64.js';
 import urlToJson from '@/utils/url2json.js';
 import got from 'got';
 import loki from 'lokijs';
+import OpenAI from 'openai';
+import { ChatModel } from 'openai/resources.mjs';
 
 type AiChat = {
 	question: string;
 	prompt: string;
-	api: string;
+	api?: string;
+	model?: ChatModel;
 	key: string;
 	fromMention: boolean;
 	friendName?: string;
@@ -85,6 +88,7 @@ const GEMINI_PRO = 'gemini-pro';
 const GEMINI_FLASH = 'gemini-flash';
 const TYPE_PLAMO = 'plamo';
 const GROUNDING_TARGET = 'ggg';
+const TYPE_CHATGPT = 'chatgpt';
 
 const GEMINI_20_FLASH_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 // const GEMINI_15_FLASH_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
@@ -345,6 +349,92 @@ export default class extends Module {
 	}
 
 	@bindThis
+	private async genTextByChatGPT(aiChat: AiChat) {
+		this.log('Generate Text By ChatGPT...');
+
+		const now = new Date().toLocaleString('ja-JP', {
+			timeZone: 'Asia/Tokyo',
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit'
+		});
+		// 設定のプロンプトに加え、現在時刻を渡す
+		let systemInstructionText = aiChat.prompt + 'また、現在日時は' + now + 'であり、これは回答の参考にし、時刻を聞かれるまで時刻情報は提供しないこと(なお、他の日時は無効とすること)。';
+		// 名前を伝えておく
+		if (aiChat.friendName != undefined) {
+			systemInstructionText += 'なお、会話相手の名前は' + aiChat.friendName + 'とする。';
+		}
+		// ランダムトーク機能(利用者が意図(メンション)せず発動)の場合、ちょっとだけ配慮しておく
+		if (!aiChat.fromMention) {
+			systemInstructionText += 'これらのメッセージは、あなたに対するメッセージではないことを留意し、返答すること(会話相手は突然話しかけられた認識している)。';
+		}
+
+		if (aiChat.question !== undefined) {
+			const urlexp = RegExp('(https?://[a-zA-Z0-9!?/+_~=:;.,*&@#$%\'-]+)', 'g');
+			const urlarray = [...aiChat.question.matchAll(urlexp)];
+			if (urlarray.length > 0) {
+				for (const url of urlarray) {
+					this.log('URL:' + url[0]);
+					let result: unknown = null;
+					try{
+						result = await urlToJson(url[0]);
+					} catch (err: unknown) {
+						systemInstructionText += '補足として提供されたURLは無効でした:URL=>' + url[0]
+						this.log('Skip url becase error in urlToJson');
+						continue;
+					}
+					const urlpreview: UrlPreview = result as UrlPreview;
+					if (urlpreview.title) {
+						systemInstructionText +=
+							'補足として提供されたURLの情報は次の通り:URL=>' + urlpreview.url
+							+'サイト名('+urlpreview.sitename+')、';
+						if (!urlpreview.sensitive) {
+							systemInstructionText +=
+							'タイトル('+urlpreview.title+')、'
+							+ '説明('+urlpreview.description+')、'
+							+ '質問にあるURLとサイト名・タイトル・説明を組み合わせ、回答の参考にすること。'
+							;
+							this.log('urlpreview.sitename:' + urlpreview.sitename);
+							this.log('urlpreview.title:' + urlpreview.title);
+							this.log('urlpreview.description:' + urlpreview.description);
+						} else {
+							systemInstructionText +=
+							'これはセンシティブなURLの可能性があるため、質問にあるURLとサイト名のみで、回答の参考にすること(使わなくても良い)。'
+							;
+						}
+					} else {
+						// 多分ここにはこないが念のため
+						this.log('urlpreview.title is nothing');
+					}
+				}
+			}
+		}
+		try {
+			const client = new OpenAI({
+				apiKey: aiChat.key,
+			});
+			const response = await client.chat.completions.create({
+				model: aiChat.model!,
+				messages: [
+					{role: 'system', content: systemInstructionText},
+					{role: 'user', content: aiChat.question},
+				],
+			});
+	
+			return response.choices[0].message.content;
+	
+		} catch (err: unknown) {
+			this.log('Error By Call Gemini');
+			if (err instanceof Error) {
+				this.log(`${err.name}\n${err.message}\n${err.stack}`);
+			}
+		}
+		return null;
+	}
+
+	@bindThis
 	private async note2base64File(notesId: string) {
 		const noteData = await this.ai.api('notes/show', { noteId: notesId });
 		let files:base64File[] = [];
@@ -406,13 +496,11 @@ export default class extends Module {
 		}
 
 		// タイプを決定
-		let type = TYPE_GEMINI;
+		let type = TYPE_CHATGPT;
 		if (msg.includes([KIGO + TYPE_GEMINI])) {
 			type = TYPE_GEMINI;
-		} else if (msg.includes([KIGO + 'chatgpt4'])) {
-			type = 'chatgpt4';
-		} else if (msg.includes([KIGO + 'chatgpt'])) {
-			type = 'chatgpt3.5';
+		} else if (msg.includes([KIGO + TYPE_CHATGPT])) {
+			type = TYPE_CHATGPT;
 		} else if (msg.includes([KIGO + TYPE_PLAMO])) {
 			type = TYPE_PLAMO;
 		}
@@ -675,6 +763,29 @@ export default class extends Module {
 					fromMention: exist.fromMention
 				};
 				text = await this.genTextByPLaMo(aiChat);
+				break;
+			case TYPE_CHATGPT:
+				// ChatGPTの場合、APIキーが必須
+				if(!config.openAiApiKey) {
+					msg.reply(serifs.aichat.nothing(exist.type));
+					return false;
+				}
+				if(!config.openAiModel) {
+					msg.reply(serifs.aichat.nothing(exist.type));
+					return false;
+				}
+
+				aiChat = {
+					question: question,
+					prompt: prompt,
+					key: config.openAiApiKey,
+					model: config.openAiModel as ChatModel,
+					history: exist.history,
+					friendName: friendName,
+					fromMention: exist.fromMention
+				};
+
+				text = await this.genTextByChatGPT(aiChat);
 				break;
 
 			default:
