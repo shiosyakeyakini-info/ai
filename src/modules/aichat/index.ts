@@ -646,7 +646,7 @@ export default class extends Module {
 			return false;
 		}
 		const friend: Friend | null = this.ai.lookupFriend(choseNote.userId);
-		if (friend == null || friend.love < 7) {
+		if (friend == null || friend.love < 0) {
 			this.log('AiChat(randomtalk) end.Because there was not enough affection.');
 			return false;
 		} else if (choseNote.user.isBot) {
@@ -657,7 +657,7 @@ export default class extends Module {
 		const current : AiChatHist = {
 			postId: choseNote.id,
 			createdAt: Date.now(),// 適当なもの
-			type: TYPE_GEMINI,		// 別のAPIをデフォルトにしてもよい
+			type: TYPE_CHATGPT,		// 別のAPIをデフォルトにしてもよい
 			fromMention: false,		// ランダムトークの場合はfalseとする
 		};
 		// AIに問い合わせ
