@@ -352,6 +352,26 @@ export default class extends Module {
 	private async genTextByChatGPT(aiChat: AiChat) {
 		this.log('Generate Text By ChatGPT...');
 
+		let emojiMessage = `
+また、以下の絵文字を必要に応じて使用してください。
+:seshiblob_jump: :seshiblob_nico: :ablobcatpnd_heart_happy: 嬉しいとき
+:seshiblob_good: :pndslime_omedeto: :usago_suggee: 褒めるとき
+:seshiblob_think: :blobcatpnd_miage: :shiropuyo_thinking: 考えているとき
+:seshiblob_cry: :ablobcatpnd_boronaki: :ablobcatpnd_namidagadechau: 悲しいとき
+:pndslime_yodare: 食事について言及するとき
+:pndslime_purupuru: 驚いたり恐怖について述べるとき
+:ablobcatpnd_dancing: :blob_yannya: 楽しいとき
+:usago_yabee: :shiropuyo_wow: 驚くとき
+:ablobcatpnd_longlong: :ablobcatpnd_yorisoi_mocho: :10neko: いたわるとき
+:ablobcatpnd_ojigi: 礼をするとき
+:shiropuyo_ase: 困っているとき
+:ablobcatpnd_running: :daiconwalk: 何かの行動を一緒にすることを示すとき
+:ablobcatpnd_uruuru: :ablobcatpnd_oooo: :nanika04: ユーザーの行動に興味を持つとき
+:blob_hold_hands: :blob_sore: ユーザーの行動に同意を示すとき
+:blob_lovepunch: ユーザーに好意を示すとき
+:09neko: ユーザーにこんにちはの挨拶をするとき
+:usago_iwai: ユーザーを祝福するとき
+`
 		const now = new Date().toLocaleString('ja-JP', {
 			timeZone: 'Asia/Tokyo',
 			year: 'numeric',
@@ -370,6 +390,7 @@ export default class extends Module {
 		if (!aiChat.fromMention) {
 			systemInstructionText += 'これらのメッセージは、あなたに対するメッセージではないことを留意し、返答すること(会話相手は突然話しかけられた認識している)。';
 		}
+		systemInstructionText += emojiMessage;
 
 		if (aiChat.question !== undefined) {
 			const urlexp = RegExp('(https?://[a-zA-Z0-9!?/+_~=:;.,*&@#$%\'-]+)', 'g');
