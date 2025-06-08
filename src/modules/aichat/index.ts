@@ -353,7 +353,7 @@ export default class extends Module {
 		this.log('Generate Text By ChatGPT...');
 
 		let emojiMessage = `
-また、Unicodeの絵文字は用いずに以下の絵文字を文末や文中に使用してください。
+Unicodeの絵文字は用いずに以下の絵文字を文末や文中に使用してください。
 :seshiblob_jump: :seshiblob_nico: :ablobcatpnd_heart_happy: 嬉しいとき
 :seshiblob_good: :pndslime_omedeto: :usago_suggee: 褒めるとき
 :seshiblob_think: :blobcatpnd_miage: :shiropuyo_thinking: 考えているとき
@@ -390,7 +390,6 @@ export default class extends Module {
 		if (!aiChat.fromMention) {
 			systemInstructionText += 'これらのメッセージは、あなたに対するメッセージではないことを留意し、返答すること(会話相手は突然話しかけられた認識している)。';
 		}
-		systemInstructionText += emojiMessage;
 
 		if (aiChat.question !== undefined) {
 			const urlexp = RegExp('(https?://[a-zA-Z0-9!?/+_~=:;.,*&@#$%\'-]+)', 'g');
@@ -440,6 +439,7 @@ export default class extends Module {
 				model: aiChat.model!,
 				messages: [
 					{role: 'system', content: systemInstructionText},
+					{role: 'system', content: emojiMessage},
 					{role: 'user', content: aiChat.question},
 				],
 			});
