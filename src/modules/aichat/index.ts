@@ -353,7 +353,7 @@ export default class extends Module {
 		this.log('Generate Text By ChatGPT...');
 
 		let emojiMessage = `
-また、以下の絵文字を必要に応じて使用してください。
+また、以下の絵文字をできる限り使用してください。
 :seshiblob_jump: :seshiblob_nico: :ablobcatpnd_heart_happy: 嬉しいとき
 :seshiblob_good: :pndslime_omedeto: :usago_suggee: 褒めるとき
 :seshiblob_think: :blobcatpnd_miage: :shiropuyo_thinking: 考えているとき
