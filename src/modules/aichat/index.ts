@@ -353,24 +353,24 @@ export default class extends Module {
 		this.log('Generate Text By ChatGPT...');
 
 		let emojiMessage = `
-Unicodeの絵文字は用いずに以下の絵文字を文末や文中に使用してください。
-:seshiblob_jump: :seshiblob_nico: :ablobcatpnd_heart_happy: 嬉しいとき
-:seshiblob_good: :pndslime_omedeto: :usago_suggee: 褒めるとき
-:seshiblob_think: :blobcatpnd_miage: :shiropuyo_thinking: 考えているとき
-:seshiblob_cry: :ablobcatpnd_boronaki: :ablobcatpnd_namidagadechau: 悲しいとき
-:pndslime_yodare: 食事について言及するとき
-:pndslime_purupuru: 驚いたり恐怖について述べるとき
-:ablobcatpnd_dancing: :blob_yannya: 楽しいとき
-:usago_yabee: :shiropuyo_wow: 驚くとき
-:ablobcatpnd_longlong: :ablobcatpnd_yorisoi_mocho: :10neko: いたわるとき
-:ablobcatpnd_ojigi: 礼をするとき
-:shiropuyo_ase: 困っているとき
-:ablobcatpnd_running: :daiconwalk: 何かの行動を一緒にすることを示すとき
-:ablobcatpnd_uruuru: :ablobcatpnd_oooo: :nanika04: ユーザーの行動に興味を持つとき
-:blob_hold_hands: :blob_sore: ユーザーの行動に同意を示すとき
-:blob_lovepunch: ユーザーに好意を示すとき
-:09neko: ユーザーにこんにちはの挨拶をするとき
-:usago_iwai: ユーザーを祝福するとき
+Unicodeの絵文字は用いずに、必ず以下のショートコードを文末や文中に使用してください。
+嬉しいとき :seshiblob_jump: :seshiblob_nico: :ablobcatpnd_heart_happy:
+褒めるとき :seshiblob_good: :pndslime_omedeto: :usago_suggee:
+考えているとき :seshiblob_think: :blobcatpnd_miage: :shiropuyo_thinking:
+悲しいとき :seshiblob_cry: :ablobcatpnd_boronaki: :ablobcatpnd_namidagadechau:
+楽しいとき :ablobcatpnd_dancing: :blob_yannya:
+驚くとき :usago_yabee: :shiropuyo_wow:
+食事について言及するとき :pndslime_yodare:
+驚いたり恐怖について述べるとき :pndslime_purupuru:
+いたわるとき :ablobcatpnd_longlong: :ablobcatpnd_yorisoi_mocho: :10neko:
+礼をするとき :ablobcatpnd_ojigi:
+困っているとき :shiropuyo_ase:
+何かの行動を一緒にすることを示すとき　:ablobcatpnd_running: :daiconwalk:
+同意を示すとき :blob_hold_hands: :blob_sore:
+好意を示すとき :blob_lovepunch:
+こんにちはの挨拶をするとき :09neko:
+ユーザーの行動に興味を持つとき :ablobcatpnd_uruuru: :ablobcatpnd_oooo: :nanika04:
+ユーザーを祝福するとき :usago_iwai:
 `
 		const now = new Date().toLocaleString('ja-JP', {
 			timeZone: 'Asia/Tokyo',
