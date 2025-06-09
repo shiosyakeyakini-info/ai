@@ -58,6 +58,9 @@ Misskey用の日本語Botです。
 	"aichatRandomTalkProbability": "ランダムにaichatを発動し話しかける機能の確率(1以下の小数点を含む数値(0.01など。1に近づくほど発動しやすい))",
 	"aichatRandomTalkIntervalMinutes": "ランダムトーク間隔(分)。指定した時間ごとにタイムラインを取得し、適当に選んだ人にaichatする(1の場合1分ごと実行)。デフォルトは720分(12時間)",
 	"aichatGroundingWithGoogleSearchAlwaysEnabled": "aichatでGoogle検索を利用したグラウンディングを常に行う場合 true を入れる (無効にする場合は false(いずれも二重引用符(”)は不要))",
+	"reactedAiChatTargetCategories": "aichat版リアクションで使用するカテゴリリスト",
+	"reactedAiChatTargetEmojisRatio": "aichat版リアクションのカテゴリリストで、トークン数削減のためにランダムで使用する絵文字を絞る場合の比率",
+	"reactedAiChatProbability": "aichat版リアクションを発生させる確率",
 	"mecab": "/usr/bin/mecab",
 	"mecabDic": "/usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd/",
 	"memoryDir": "data"

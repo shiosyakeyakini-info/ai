@@ -447,7 +447,7 @@ Unicodeの絵文字は用いずに、必ず以下のショートコードを文�
 			return response.choices[0].message.content;
 	
 		} catch (err: unknown) {
-			this.log('Error By Call Gemini');
+			this.log('Error By Call ChatGPT');
 			if (err instanceof Error) {
 				this.log(`${err.name}\n${err.message}\n${err.stack}`);
 			}

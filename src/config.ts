@@ -21,6 +21,9 @@ type Config = {
 	aichatRandomTalkProbability?: string;
 	aichatRandomTalkIntervalMinutes?: string;
 	aichatGroundingWithGoogleSearchAlwaysEnabled?: boolean;
+	reactedAiChatTargetCategories: string[];
+	reactedAiChatTargetEmojisRatio?: number;
+	reactedAiChatProbability?: number;
 	mecab?: string;
 	mecabDic?: string;
 	memoryDir?: string;
