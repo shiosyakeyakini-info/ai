@@ -71,8 +71,15 @@ export default class extends Module {
 
 		if(!config.openAiApiKey) return;
 		if(!config.openAiModel) return;
-		if(note.text == null) return;
-		if(Math.random() > (config.reactedAiChatProbability ?? 0.5)) return;
+		
+		if(
+			note.user?.host !== null &&
+			Math.random() > (config.reactedAiChatProbabilityInRemoteUser ?? 0.001)
+		) return;
+		if(
+			note.user?.host === null &&
+			Math.random() > (config.reactedAiChatProbabilityInLocalUser ?? 0.01)
+		) return;
 
 		const emojis: Emoji[] = ((await got.post(`${config.apiUrl}/emojis`, {
 			json: {

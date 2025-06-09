@@ -23,7 +23,8 @@ type Config = {
 	aichatGroundingWithGoogleSearchAlwaysEnabled?: boolean;
 	reactedAiChatTargetCategories: string[];
 	reactedAiChatTargetEmojisRatio?: number;
-	reactedAiChatProbability?: number;
+	reactedAiChatProbabilityInLocalUser?: number;
+	reactedAiChatProbabilityInRemoteUser?: number;
 	mecab?: string;
 	mecabDic?: string;
 	memoryDir?: string;
