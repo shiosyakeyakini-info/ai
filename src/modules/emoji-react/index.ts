@@ -14,7 +14,15 @@ import { Emoji } from '@/misskey/emoji.js';
 export default class extends Module {
 	public readonly name = 'emoji-react';
 
-	private htl: ReturnType<Stream['useSharedConnection']>;
+        private htl: ReturnType<Stream['useSharedConnection']>;
+
+       private async fetchEmojis(): Promise<Emoji[]> {
+               return ((await got.post(`${config.apiUrl}/emojis`, {
+                       json: {
+                               i: config.i,
+                       },
+               }).json()) as any)["emojis"];
+       }
 
 	@bindThis
 	public install() {
@@ -29,15 +37,20 @@ export default class extends Module {
 
 		if (note.reply != null) return;
 		if (note.text == null) return;
-		const customEmojis = note.text.match(/:([^\n:]+?):/g);
-		if (customEmojis) {
-			// カスタム絵文字が複数種類ある場合はキャンセル
-			if (!customEmojis.every((val, i, arr) => val === arr[0])) return;
+               const customEmojis = note.text.match(/:([^\n:]+?):/g);
+               if (customEmojis) {
+                       // カスタム絵文字が複数種類ある場合はキャンセル
+                       if (!customEmojis.every((val, i, arr) => val === arr[0])) return;
 
-			this.log(`Custom emoji detected - ${customEmojis[0]}`);
+                       this.log(`Custom emoji detected - ${customEmojis[0]}`);
 
-			return {reaction: customEmojis[0]};
-		}
+                       const emojis = await this.fetchEmojis();
+                       const name = customEmojis[0].slice(1, -1);
+                       const exists = emojis.some(e => e.name === name || (e.aliases ?? []).includes(name));
+                       if (!exists) return;
+
+                       return {reaction: customEmojis[0]};
+               }
 
 		const emojis = parse(note.text).map(x => x.text);
 		if (emojis.length > 0) {
@@ -81,21 +94,17 @@ export default class extends Module {
 			Math.random() > (config.reactedAiChatProbabilityInLocalUser ?? 0.01)
 		) return;
 
-		const emojis: Emoji[] = ((await got.post(`${config.apiUrl}/emojis`, {
-			json: {
-				i: config.i
-			}
-		}).json()) as any)["emojis"];
+               const emojis: Emoji[] = await this.fetchEmojis();
 
 		const targetCategories = config.reactedAiChatTargetCategories;
 
-		const useEmoji = emojis
-			.filter(e => 
-					!e.localOnly && targetCategories.includes(e.category ?? '')
-			)
-			.filter(() => Math.random() < (config.reactedAiChatTargetEmojisRatio ?? 1))
-			.map((e) => `:${e.name}: ${e.aliases?.join(', ')}`)
-			.join('\n');
+               const useEmoji = emojis
+                       .filter(e =>
+                                       !e.localOnly && targetCategories.includes(e.category ?? '')
+                       )
+                       .filter(() => Math.random() < (config.reactedAiChatTargetEmojisRatio ?? 1))
+                       .map((e) => `:${e.name}: ${e.aliases?.join(', ')}`)
+                       .join('\n');
 
 		try {
 					const client = new OpenAI({
@@ -103,10 +112,10 @@ export default class extends Module {
 					});
 
 
-					const systemInstructionText = `
+                                       const systemInstructionText = `
 あなたは、Misskeyのユーザーが投稿したノートに対して、適切なリアクションを提案するAIです。
 あなたの提案は、ノートの内容に基づいて、ユーザーが喜ぶようなリアクションを選ぶことを目指してください。
-下記のリアクションから一つを選択して、:reaction:形式で返答してください。
+下記のリアクションから3つ提案してください。:reaction:形式を改行区切りで最大3つ返答してください。
 リアクションの候補:
 ${useEmoji}`;
 
@@ -117,10 +126,18 @@ ${useEmoji}`;
 							{role: 'user', content: note.text},
 						],
 					});
-					this.log(`ChatGPT response: ${response.choices[0].message.content}, used tokens: ${response.usage?.total_tokens}`);
-			
-					const match = response.choices[0].message.content?.match(/:.+:/);
-					return match ? match[0] : undefined;
+                                       this.log(`ChatGPT response: ${response.choices[0].message.content}, used tokens: ${response.usage?.total_tokens}`);
+
+                                       const matches = response.choices[0].message.content?.match(/:[^\s:]+:/g);
+                                       if (matches) {
+                                               for (const m of matches.slice(0, 3)) {
+                                                       const name = m.slice(1, -1);
+                                                       if (emojis.some(e => e.name === name || (e.aliases ?? []).includes(name))) {
+                                                               return m;
+                                                       }
+                                               }
+                                       }
+                                       return undefined;
 			
 				} catch (err: unknown) {
 					this.log('Error By Call ChatGPT');
