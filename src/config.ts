@@ -3,8 +3,8 @@ type Config = {
 	serverName?: string;
 	i: string;
 	master?: string;
-	wsUrl: string;
-	apiUrl: string;
+	wsUrl?: string;
+	apiUrl?: string;
 	keywordEnabled: boolean;
 	reversiEnabled: boolean;
 	notingEnabled: boolean;
@@ -18,13 +18,14 @@ type Config = {
 	openAiModel?: string;
 	prompt?: string;
 	aichatRandomTalkEnabled?: boolean;
-	aichatRandomTalkProbability?: string;
-	aichatRandomTalkIntervalMinutes?: string;
+	aichatRandomTalkProbability?: number;
+	aichatRandomTalkIntervalMinutes?: number;
 	aichatGroundingWithGoogleSearchAlwaysEnabled?: boolean;
-	reactedAiChatTargetCategories: string[];
+	reactedAiChatTargetCategories?: string[];
 	reactedAiChatTargetEmojisRatio?: number;
 	reactedAiChatProbabilityInLocalUser?: number;
 	reactedAiChatProbabilityInRemoteUser?: number;
+	aichatEmojiUpdateIntervalMinutes?: number;
 	mecab?: string;
 	mecabDic?: string;
 	memoryDir?: string;
