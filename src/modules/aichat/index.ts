@@ -435,13 +435,28 @@ Unicodeの絵文字は用いずに、必ず以下のショートコードを文�
 			const client = new OpenAI({
 				apiKey: aiChat.key,
 			});
+			// システムプロンプトを最初に追加
+			const messages: any[] = [
+				{role: 'system', content: systemInstructionText},
+				{role: 'system', content: emojiMessage},
+			];
+
+			// 会話履歴を追加
+			if (aiChat.history != null) {
+				aiChat.history.forEach(entry => {
+					messages.push({
+						role: entry.role === 'model' ? 'assistant' : entry.role,
+						content: entry.content
+					});
+				});
+			}
+
+			// 最新の質問を追加
+			messages.push({role: 'user', content: aiChat.question});
+
 			const response = await client.chat.completions.create({
 				model: aiChat.model!,
-				messages: [
-					{role: 'system', content: systemInstructionText},
-					{role: 'system', content: emojiMessage},
-					{role: 'user', content: aiChat.question},
-				],
+				messages: messages,
 			});
 	
 			return response.choices[0].message.content;
