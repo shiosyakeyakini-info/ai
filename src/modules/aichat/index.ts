@@ -385,6 +385,24 @@ export default class extends Module {
 
 	@bindThis
 	private async mentionHook(msg: Message) {
+		// ランダムトークのオプトアウト処理
+		if (msg.includes(['ランダムトークやめて', '話しかけないで', 'ランダムトーク停止'])) {
+			const data = msg.friend.getPerModulesData(this);
+			data.optOutRandomTalk = true;
+			msg.friend.setPerModulesData(this, data);
+			msg.reply(serifs.aichat.randomTalkOptOut);
+			return { reaction: 'love' };
+		}
+
+		// ランダムトークのオプトイン処理
+		if (msg.includes(['また話しかけて', 'ランダムトーク再開', 'ランダムトークして'])) {
+			const data = msg.friend.getPerModulesData(this);
+			data.optOutRandomTalk = false;
+			msg.friend.setPerModulesData(this, data);
+			msg.reply(serifs.aichat.randomTalkOptIn);
+			return { reaction: 'love' };
+		}
+
 		if (!msg.includes([this.name])) {
 			return false;
 		} else {
@@ -563,6 +581,13 @@ export default class extends Module {
 			return false;
 		} else if (choseNote.user.isBot) {
 			this.log('AiChat(randomtalk) end.Because message author is bot.');
+			return false;
+		}
+
+		// オプトアウトチェック
+		const perModuleData = friend.getPerModulesData(this);
+		if (perModuleData?.optOutRandomTalk === true) {
+			this.log('AiChat(randomtalk) end.Because user opted out.');
 			return false;
 		}
 

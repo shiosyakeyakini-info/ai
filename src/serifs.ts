@@ -393,6 +393,8 @@ export default {
 		nothing: type => `あぅ... ${type}のAPIキーが登録されてないみたいです`,
 		error: type => `うぇ...${type}でエラーが発生しちゃったみたいです。gemini-flashだと動くかも？`,
 		post: (text, type) => `${text} (${type}) #aichat`,
+		randomTalkOptOut: 'わかりました、関係ない話には関わらないようにしますね...',
+		randomTalkOptIn: 'またお話しできるの嬉しいです♪',
 	},
 
 	sleepReport: {
