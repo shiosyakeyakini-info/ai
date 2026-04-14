@@ -397,6 +397,12 @@ export default {
 		randomTalkOptIn: 'またお話しできるの嬉しいです♪',
 	},
 
+	emojiChat: {
+		nothing: 'あぅ... APIキーが登録されてないみたいです',
+		error: 'うぇ...絵文字チャットでエラーが発生しちゃいました',
+		post: (emojis: string) => `${emojis} #emojichat`,
+	},
+
 	sleepReport: {
 		report: hours => `んぅ、${hours}時間くらい寝ちゃってたみたいです`,
 		reportUtatane: 'ん... うたた寝しちゃってました',

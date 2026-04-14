@@ -26,6 +26,8 @@ type Config = {
 	reactedAiChatProbabilityInLocalUser?: number;
 	reactedAiChatProbabilityInRemoteUser?: number;
 	aichatEmojiUpdateIntervalMinutes?: number;
+	emojiChatTargetCategories?: string[];
+	emojiChatMaxEmojis?: number;
 	mecab?: string;
 	mecabDic?: string;
 	memoryDir?: string;

@@ -35,6 +35,7 @@ import PollModule from './modules/poll/index.js';
 import ReminderModule from './modules/reminder/index.js';
 import CheckCustomEmojisModule from './modules/check-custom-emojis/index.js';
 import AiChatModule from './modules/aichat/index.js';
+import EmojiChatModule from './modules/emoji-chat/index.js';
 
 console.log('   __    ____  _____  ___ ');
 console.log('  /__\\  (_  _)(  _  )/ __)');
@@ -74,6 +75,7 @@ promiseRetry(retry => {
 	// 藍起動
 	new 藍(account, [
 		new CoreModule(),
+		new EmojiChatModule(),
 		new AiChatModule(),
 		new ReminderModule(),
 		new TalkModule(),
